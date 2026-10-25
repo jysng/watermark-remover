@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="72 18 256 156" width="100%" height="100%"><style>
+    .text-title {
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        font-size: 32px;
+        fill: #4B2875;
+        letter-spacing: 1px;
+        font-weight: 500;
+    }
+</style><g transform="translate(170, 20)"><path d="M 30,10 C 25,30 40,65 60,85 C 50,90 35,90 28,88 C 42,95 58,95 72,83 C 78,78 72,75 70,72 C 60,65 42,40 30,10 Z" fill="#4B2875" /><path d="M 32,25 C 29,40 40,68 55,82 C 48,84 38,82 34,80 C 44,85 54,84 62,77 C 55,70 42,48 32,25 Z" fill="#A0A0A0" /></g><text x="200" y="160" text-anchor="middle" class="text-title">MOON-HEX-AI</text></svg>

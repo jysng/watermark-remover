@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Gemini Watermark Remover &amp; Logo Remover | Moonhex</title>
+    <meta name="description" content="Free Gemini watermark and logo remover. Remove marks from images you own or have permission to edit, then download the result as a PNG.">
+    <meta name="robots" content="index,follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Gemini Watermark Remover &amp; Logo Remover | Moonhex">
+    <meta property="og:description" content="Remove marks from images you own or have permission to edit, then download the result as a PNG.">
+    <meta property="og:image" content="logo.svg">
+    <meta name="twitter:card" content="summary">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Free Gemini Watermark Remover & Logo Remover",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "description": "An image editing tool for removing logos from images the user has permission to modify."
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #251d2c;
+            --muted: #746d78;
+            --paper: #f2eff4;
+            --line: #d8d2dd;
+            --accent: #4b2875;
+            --accent-dark: #392055;
+            --silver: #a0a0a0;
+            --stage: #201929;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0 32px 28px;
+            color: var(--ink);
+            background: linear-gradient(135deg, #faf8fc, var(--paper));
+            font-family: "Manrope", "Avenir Next", sans-serif;
+        }
+        .container { width: min(100%, 1440px); margin: 0 auto; }
+        .topbar {
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--line);
+        }
+        .brand { display: flex; align-items: center; }
+        .brand-mark {
+            width: min(250px, 80vw);
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .eyebrow, .stage-label, .panel-kicker {
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .brand-type { display: block; margin-top: 2px; color: var(--muted); }
+        .intro {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 34px 0 22px;
+        }
+        .eyebrow { margin: 0 0 9px; color: var(--accent); }
+        h1 { margin: 0; font-size: 38px; line-height: 1.12; font-weight: 800; }
+        .instructions { max-width: 530px; margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+        .credit { margin: 0 0 4px; color: var(--muted); font-size: 12px; }
+        .credit a { color: var(--accent); font-weight: 700; text-underline-offset: 3px; }
+        .upload-zone {
+            padding: 16px 20px;
+            border: 1px dashed var(--silver);
+            border-radius: 5px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.72);
+            text-align: center;
+            transition: background 160ms ease, border-color 160ms ease;
+        }
+        .upload-zone:hover { border-color: var(--accent); background: #f8f5fa; }
+        .upload-zone p { margin: 0; font-size: 13px; }
+        .upload-zone strong { color: var(--accent); background: transparent; }
+        .subscribe {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--line);
+        }
+        .subscribe-copy { max-width: 340px; }
+        .subscribe h2 { margin: 0; font-size: 21px; }
+        .subscribe p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+        .subscribe iframe { display: block; width: 100%; max-width: 480px; height: 320px; border: 0; background: transparent; }
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 310px;
+            gap: 16px;
+            margin-top: 16px;
+            align-items: stretch;
+        }
+        .stage {
+            position: relative;
+            min-width: 0;
+            min-height: 560px;
+            overflow: hidden;
+            padding: 18px;
+            border-radius: 5px;
+            color: #f2f5ec;
+            background-color: var(--stage);
+            background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .stage-label { display: flex; justify-content: space-between; color: #a7b5aa; }
+        .empty-state {
+            position: absolute;
+            inset: 48px 20px 20px;
+            display: grid;
+            place-content: center;
+            text-align: center;
+            pointer-events: none;
+        }
+        .empty-icon {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 16px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #58665e;
+            border-radius: 50%;
+            color: var(--silver);
+            font-size: 27px;
+            font-weight: 400;
+        }
+        .empty-state strong { font-size: 15px; }
+        .empty-state span { margin-top: 7px; color: #c0bbc4; font-size: 12px; }
+        #canvas-container {
+            position: absolute;
+            inset: 48px 18px 18px;
+            display: none;
+            overflow: auto;
+            text-align: center;
+        }
+        canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            margin: auto;
+            cursor: crosshair;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+        .panel-kicker { padding-bottom: 13px; border-bottom: 1px solid var(--line); color: var(--accent); }
+        .control-group { display: grid; gap: 8px; }
+        .control-label { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; font-weight: 700; }
+        output { color: var(--accent); font-family: "DM Mono", monospace; }
+        input[type="range"] { width: 100%; accent-color: var(--accent); }
+        button {
+            min-height: 42px;
+            padding: 10px 13px;
+            border: 1px solid var(--ink);
+            border-radius: 4px;
+            color: white;
+            background: var(--ink);
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 150ms ease, background 150ms ease;
+        }
+        button:hover { transform: translateY(-1px); background: #382b45; }
+        button:focus-visible, input:focus-visible { outline: 3px solid var(--silver); outline-offset: 3px; }
+        button.primary { border-color: var(--accent); color: white; background: var(--accent); }
+        button.primary:hover { background: var(--accent-dark); }
+        button.outline { color: var(--ink); background: transparent; }
+        button.outline:hover { background: #f4f0f7; }
+        button.download { margin-top: auto; border-color: var(--accent-dark); background: var(--accent-dark); }
+        @media (max-width: 860px) {
+            body { padding: 0 20px 24px; }
+            .workspace { grid-template-columns: minmax(0, 1fr) 270px; }
+            .stage { min-height: 470px; }
+            h1 { font-size: 32px; }
+        }
+        @media (max-width: 680px) {
+            body { padding: 0 14px 20px; }
+            .topbar { min-height: 122px; }
+            .brand-mark { width: min(190px, 80vw); }
+            .intro { align-items: start; flex-direction: column; padding-top: 26px; }
+            .credit { margin: 0; }
+            .subscribe { flex-direction: column; gap: 16px; }
+            .subscribe iframe { max-width: 480px; }
+            .workspace { grid-template-columns: minmax(0, 1fr); }
+            .stage { min-height: 390px; }
+            .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+            .panel-kicker, .download { grid-column: 1 / -1; }
+            .control-group { align-content: start; }
+            h1 { font-size: 28px; }
+        }
+        @media (max-width: 390px) {
+            .controls { grid-template-columns: 1fr; }
+            .panel-kicker, .download { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="topbar">
+        <div class="brand">
+            <img class="brand-mark" src="logo.svg" alt="Moon-Hex-AI">
+        </div>
+    </header>
+
+    <main>
+        <section class="intro">
+            <div>
+                <p class="eyebrow">IMAGE TOOL / 01</p>
+                <h1>Free Gemini Watermark Remover &amp; Logo Remover</h1>
+                <p class="instructions">Remove Gemini watermarks or other logos from images you have permission to edit. Export a finished PNG when you are done.</p>
+            </div>
+            <p class="credit">Created by Moonhex · <a href="https://www.linkedin.com/in/jysng" target="_blank" rel="noopener noreferrer">LinkedIn profile</a></p>
+        </section>
+
+        <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <p>Drop an image here or <strong>browse files</strong></p>
+            <input type="file" id="file-input" accept="image/*" style="display:none">
+        </div>
+
+        <div class="workspace">
+            <section class="stage" aria-label="Image preview">
+                <div class="stage-label"><span>PREVIEW CANVAS</span><span>01 / EDIT</span></div>
+                <div class="empty-state" id="empty-state">
+                    <span class="empty-icon" aria-hidden="true">+</span>
+                    <strong>Your canvas is ready</strong>
+                    <span>Choose an image above to start editing</span>
+                </div>
+                <div id="canvas-container"><canvas id="editor-canvas"></canvas></div>
+            </section>
+
+            <aside class="controls" id="controls" style="display:none;" aria-label="Image editing controls">
+                <div class="panel-kicker">RETOUCH SETTINGS</div>
+                <div class="control-group">
+                    <label class="control-label" for="brush-size">Brush size <output id="brush-size-value">20 px</output></label>
+                    <input type="range" id="brush-size" min="5" max="50" value="20">
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="logo-area-size">Corner area <output id="logo-area-value">8%</output></label>
+                    <input type="range" id="logo-area-size" min="3" max="25" value="8">
+                </div>
+                <button class="primary" onclick="autoRemoveLogo()">Auto remove corner logo</button>
+                <button onclick="processInpaint()">Remove painted area</button>
+                <button class="outline" onclick="chooseNewImage()">New image</button>
+                <button class="download" onclick="downloadImage()">Download PNG</button>
+            </aside>
+        </div>
+
+        <section class="subscribe" aria-labelledby="subscribe-title">
+            <div class="subscribe-copy">
+                <p class="eyebrow">MOONHEX NOTES</p>
+                <h2 id="subscribe-title">Get updates from Moonhex</h2>
+                <p>Subscribe for new tools and project updates.</p>
+            </div>
+            <iframe src="https://jaimsingh.substack.com/embed?transparent=1&amp;light=1" width="480" height="320" style="border: 0; background: transparent" frameborder="0" scrolling="no" title="Subscribe to Moonhex on Substack" loading="lazy"></iframe>
+        </section>
+    </main>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+    const dropZone = document.getElementById('drop-zone');
+    const canvasContainer = document.getElementById('canvas-container');
+    const canvas = document.getElementById('editor-canvas');
+    const ctx = canvas.getContext('2d');
+    const controls = document.getElementById('controls');
+    const emptyState = document.getElementById('empty-state');
+    const brushSlider = document.getElementById('brush-size');
+    const brushSizeValue = document.getElementById('brush-size-value');
+    const logoAreaSlider = document.getElementById('logo-area-size');
+    const logoAreaValue = document.getElementById('logo-area-value');
+
+    let originalImage = new Image();
+    let isDrawing = false;
+    let maskCanvas;
+    let maskCtx;
+
+    fileInput.addEventListener('change', handleFile);
+    brushSlider.addEventListener('input', () => {
+        brushSizeValue.value = `${brushSlider.value} px`;
+    });
+    logoAreaSlider.addEventListener('input', () => {
+        logoAreaValue.value = `${logoAreaSlider.value}%`;
+    });
+    dropZone.addEventListener('dragover', (event) => event.preventDefault());
+    dropZone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        loadFile(event.dataTransfer.files[0]);
+    });
+
+    function handleFile(event) {
+        loadFile(event.target.files[0]);
+    }
+
+    function chooseNewImage() {
+        fileInput.value = '';
+        fileInput.click();
+    }
+
+    function loadFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            originalImage.onload = setupCanvas;
+            originalImage.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function setupCanvas() {
+        canvas.width = originalImage.naturalWidth;
+        canvas.height = originalImage.naturalHeight;
+        ctx.drawImage(originalImage, 0, 0);
+
+        maskCanvas = document.createElement('canvas');
+        maskCanvas.width = canvas.width;
+        maskCanvas.height = canvas.height;
+        maskCtx = maskCanvas.getContext('2d');
+        maskCtx.fillStyle = 'black';
+        maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+        canvasContainer.style.display = 'block';
+        emptyState.style.display = 'none';
+        controls.style.display = '';
+        dropZone.style.padding = '15px 20px';
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+    canvas.addEventListener('touchstart', (event) => {
+        event.preventDefault();
+        startDrawing(event.touches[0]);
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (event) => {
+        event.preventDefault();
+        draw(event.touches[0]);
+    }, { passive: false });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    function startDrawing(event) {
+        if (!maskCtx) return;
+        isDrawing = true;
+        draw(event);
+    }
+
+    function draw(event) {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (event.clientX - rect.left) * scaleX;
+        const y = (event.clientY - rect.top) * scaleY;
+        const radius = Number(brushSlider.value);
+
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        maskCtx.fillStyle = 'white';
+        maskCtx.beginPath();
+        maskCtx.arc(x, y, radius, 0, Math.PI * 2);
+        maskCtx.fill();
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    function autoRemoveLogo() {
+        if (!maskCtx || !originalImage.naturalWidth) return;
+        const smallestSide = Math.min(canvas.width, canvas.height);
+        const side = Math.min(smallestSide, Math.max(12, Math.round(smallestSide * Number(logoAreaSlider.value) / 100)));
+        const inset = Math.round(side * 0.2);
+        const x = Math.max(0, canvas.width - side - inset);
+        const y = Math.max(0, canvas.height - side - inset);
+        maskCtx.fillStyle = 'white';
+        maskCtx.fillRect(x, y, side, side);
+        processInpaint();
+    }
+
+    function processInpaint() {
+        if (!maskCtx || !originalImage.naturalWidth) return;
+        ctx.drawImage(originalImage, 0, 0);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+        let minX = canvas.width;
+        let minY = canvas.height;
+        let maxX = -1;
+        let maxY = -1;
+
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const pixel = y * canvas.width + x;
+                if (maskData.data[pixel * 4] <= 200) continue;
+                minX = Math.min(minX, x);
+                minY = Math.min(minY, y);
+                maxX = Math.max(maxX, x);
+                maxY = Math.max(maxY, y);
+            }
+        }
+
+        if (maxX >= 0) {
+            const regionWidth = maxX - minX + 1;
+            const regionHeight = maxY - minY + 1;
+            const sourceData = new Uint8ClampedArray(imgData.data);
+            let shiftX = 0;
+            let shiftY = 0;
+            if (minX >= regionWidth) {
+                shiftX = -regionWidth;
+            } else if (canvas.width - maxX - 1 >= regionWidth) {
+                shiftX = regionWidth;
+            } else if (minY >= regionHeight) {
+                shiftY = -regionHeight;
+            } else if (canvas.height - maxY - 1 >= regionHeight) {
+                shiftY = regionHeight;
+            }
+
+            for (let y = minY; y <= maxY; y++) {
+                for (let x = minX; x <= maxX; x++) {
+                    const pixel = y * canvas.width + x;
+                    if (maskData.data[pixel * 4] <= 200) continue;
+
+                    let sourceX = x + shiftX;
+                    let sourceY = y + shiftY;
+                    if (!shiftX && !shiftY) {
+                        sourceX = x < canvas.width / 2 ? maxX + 1 : minX - 1;
+                    }
+                    sourceX = Math.max(0, Math.min(canvas.width - 1, sourceX));
+                    sourceY = Math.max(0, Math.min(canvas.height - 1, sourceY));
+                    const sourceOffset = (sourceY * canvas.width + sourceX) * 4;
+
+                    if (maskData.data[sourceOffset] > 200) continue;
+                    const targetOffset = pixel * 4;
+                    imgData.data[targetOffset] = sourceData[sourceOffset];
+                    imgData.data[targetOffset + 1] = sourceData[sourceOffset + 1];
+                    imgData.data[targetOffset + 2] = sourceData[sourceOffset + 2];
+                    imgData.data[targetOffset + 3] = sourceData[sourceOffset + 3];
+                }
+            }
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        maskCtx.fillStyle = 'black';
+        maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+    }
+
+    function downloadImage() {
+        if (!originalImage.naturalWidth) return;
+        const link = document.createElement('a');
+        link.download = 'logo-removed.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+</script>
+</body>
+</html>
